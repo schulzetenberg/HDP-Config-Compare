@@ -1,0 +1,28 @@
+{
+  "name": "hdp-config-compare",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/.bin/grunt ci"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/schulzetenberg/hdp-config-compare"
+  },
+  "keywords": [],
+  "author": "Schulzetenberg, Jacob <jacob.schulzetenberg@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/schulzetenberg/hdp-config-compare/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "grunt-contrib-jshint": "^0.11.3",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt": "^0.4.5",
+    "grunt-mocha-cli": "^2.0.0",
+    "grunt-complexity": "^0.3.0",
+    "grunt-cli": "^0.1.13"
+  }
+}
