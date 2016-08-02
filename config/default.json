@@ -1,0 +1,20 @@
+{
+  "ambari": {
+    "a1": {
+      "host": "127.0.0.1",
+      "port": "8080",
+      "username": "admin",
+      "password": "hdptres3"
+    },
+    "a2": {
+      "host": "127.0.0.1",
+      "port": "8080",
+      "username": "admin",
+      "password": "hdptres3"
+    }
+  },
+  "configTypes": [
+    "mapred-site",
+    "hive-site"
+  ]
+}

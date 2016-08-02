@@ -15,7 +15,11 @@
   "bugs": {
     "url": "https://github.com/schulzetenberg/hdp-config-compare/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "config": "^1.21.0",
+    "node-rest-client": "^2.0.1",
+    "q": "^1.4.1"
+  },
   "devDependencies": {
     "chai": "^3.4.1",
     "grunt-contrib-jshint": "^0.11.3",
