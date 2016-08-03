@@ -1,20 +1,25 @@
 {
   "ambari": {
-    "a1": {
+    "dev": {
       "host": "127.0.0.1",
       "port": "8080",
+      "clusterName": "Sandbox",
+      "username": "jacob",
+      "password": "c0mcast!"
+    },
+    "test": {
+      "host": "127.0.0.1",
+      "port": "8080",
+      "clusterName": "Sandbox",
       "username": "admin",
       "password": "hdptres3"
     },
-    "a2": {
+    "prod": {
       "host": "127.0.0.1",
       "port": "8080",
+      "clusterName": "Sandbox",
       "username": "admin",
       "password": "hdptres3"
     }
-  },
-  "configTypes": [
-    "mapred-site",
-    "hive-site"
-  ]
+  }
 }

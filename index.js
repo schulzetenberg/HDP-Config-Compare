@@ -1,44 +1,58 @@
 var config = require('config');
 var Client = require('node-rest-client').Client;
 var q = require('q');
+var express = require('express');
 
-var ambari = config.ambari.a1;
-var clientOpts = {
-  user: ambari.username,
-  password: ambari.password
-};
-var client = new Client(clientOpts);
+var app = express();
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
 
-var configType = config.configTypes[0];
-getTag(configType).then(getProperties).catch(function(err){
-  console.log("Ambari API error", err);
+app.get('/', function (req, res) {
+  res.render('index');
 });
 
-// Hit Ambari API to get a list of latest configurations
-function getTag(configType) {
-  var defer = q.defer();
-  client.get('http://' + ambari.host + ':' + ambari.port + '/api/v1/clusters/Sandbox?fields=Clusters/desired_configs', function(data, response) {
-    dataJson = JSON.parse(data);
+app.get('/cluster-list', function (req, res) {
+  res.json(Object.keys(config.ambari));
+});
 
-    var config = {
-      tag: dataJson.Clusters.desired_configs[configType].tag,
-      type: configType
-    };
-    defer.resolve(config);
-  });
-  return defer.promise;
-}
+app.get('/config-list', function (req, res) {
+  if(!req.query.cluster) return res.status(500).send({ error: 'No cluster name specified' });
+  var ambari = config.ambari[req.query.cluster];
+  if(!ambari) return res.status(500).send({ error: 'No configuration for cluster name of ' + req.query.cluster });
+  var clientOpts = {
+    user: ambari.username,
+    password: ambari.password
+  };
 
-// Get the configuration properties
-function getProperties(config) {
-  var defer = q.defer();
-  client.get('http://' + ambari.host + ':' + ambari.port + '/api/v1/clusters/Sandbox/configurations?type=' + config.type + '&tag=' + config.tag, function(data, response) {
-    dataJson = JSON.parse(data);
-    console.log(dataJson.items[0].properties);
-    defer.resolve();
+  var client = new Client(clientOpts);
+  client.get('http://' + ambari.host + ':' + ambari.port + '/api/v1/clusters/' + ambari.clusterName + '?fields=Clusters/desired_configs', function(data, response) {
+    var dataJson = JSON.parse(data);
+    if(!dataJson || !dataJson.Clusters || !dataJson.Clusters) return res.status(500).send({ error: 'Could not get config data from Ambari' });
+    res.send(dataJson.Clusters.desired_configs);
   });
-  return defer.promise;
-}
+});
+
+app.get('/properties', function (req, res) {
+  if(!req.query.type || !req.query.tag) return res.status(500).send({ error: 'config type & tag must be specified' });
+  if(!req.query.cluster) return res.status(500).send({ error: 'No cluster name specified' });
+  var ambari = config.ambari[req.query.cluster];
+  var clientOpts = {
+    user: ambari.username,
+    password: ambari.password
+  };
+
+  var client = new Client(clientOpts);
+  client.get('http://' + ambari.host + ':' + ambari.port + '/api/v1/clusters/' + ambari.clusterName + '/configurations?type=' + req.query.type + '&tag=' + req.query.tag, function(data, response) {
+    var dataJson = JSON.parse(data);
+    console.log(dataJson);
+    if(!dataJson || !dataJson.items || !dataJson.items[0]) return res.status(500).send({ error: 'Could not get properties data from Ambari' });
+    res.json(dataJson.items[0].properties);
+  });
+});
+
+app.listen(3000, function () {
+  console.log('App listening on port 3000!');
+});
 
 module.exports = function () {
   return 'Hello, world';
