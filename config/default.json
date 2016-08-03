@@ -4,18 +4,18 @@
       "host": "127.0.0.1",
       "port": "8080",
       "clusterName": "Sandbox",
-      "username": "jacob",
-      "password": "c0mcast!"
+      "username": "admin",
+      "password": "hdptres3"
     },
     "test": {
-      "host": "127.0.0.1",
+      "host": "127.0.0.2",
       "port": "8080",
       "clusterName": "Sandbox",
       "username": "admin",
       "password": "hdptres3"
     },
     "prod": {
-      "host": "127.0.0.1",
+      "host": "127.0.0.3",
       "port": "8080",
       "clusterName": "Sandbox",
       "username": "admin",

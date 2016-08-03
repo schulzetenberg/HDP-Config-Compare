@@ -11,7 +11,6 @@ var app = angular.module('mainApp', []);
 
 app.controller('mainCtrl', function($scope, $http, $q) {
 
-
   $http.get("cluster-list").then(function(response){
     $scope.clusters = response.data;
    }, function(err){
