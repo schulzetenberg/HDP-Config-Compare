@@ -2,14 +2,29 @@ var config = require('config');
 var Client = require('node-rest-client').Client;
 var q = require('q');
 var express = require('express');
+var bodyParser = require('body-parser');
 var api = require('./api');
+var xml = require('./xml-parse');
 
 var app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
 app.get('/', function (req, res) {
   res.render('index');
+});
+
+app.post('/xml-to-js', function (req, res) {
+  if(!req.body.xml1 || !req.body.xml2) return res.status(500).send({ error: 'Both XML fields required' });
+  var promises = [xml.parse(req.body.xml1), xml.parse(req.body.xml2)];
+
+  q.all(promises).then(function(data){
+    res.json(data);
+  }).catch(function(err){
+    res.status(500).send({ error: err });
+  });
 });
 
 app.get('/cluster-list', function (req, res) {

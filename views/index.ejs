@@ -3,52 +3,97 @@
   <link rel="stylesheet" href="styles.css">
   <body ng-controller="mainCtrl">
 
-  <h1>HDP Configuration Compare</h1>
+  <h1>Hadoop Configuration Compare</h1>
 
-  <div>
-    <table>
-      <tr>
-        <th>Cluster</th>
-        <th>Config</th>
-        <th>Compare Cluster</th>
-        <th></th>
-      </tr>
-      <tr>
-        <td>
-          <select ng-model="selectedCluster" ng-change="configList(selectedCluster, 'configs')">
-            <option ng-repeat="cluster in clusters" ng-selected="selectedCluster == cluster" value="{{cluster}}" ng-bind="cluster"></option>
-          </select>
-        </td>
-        <td>
-          <select ng-model="selectedConfig" ng-options="key as key for (key, value) in configs"></select>
-        </td>
-        <td>
-          <select ng-model="compareCluster" ng-change="configList(compareCluster, 'configsCompare')">
-            <option ng-if="cluster !== selectedCluster" ng-repeat="cluster in clusters" ng-selected="compareCluster == cluster" value="{{cluster}}" ng-bind="cluster"></option>
-          </select>
-        </td>
-        <td>
-          <button ng-click="getConfig()" ng-disabled="!configsCompare">Go</button>
-        </td>
-      </tr>
-    </table>
-  </div>
+  <select ng-model="selectedCompare">
+    <option value="ambari">Ambari Config</option>
+    <option value="xml">Raw XML</option>
+  </select>
 
-  <div>
-    <table>
-      <tr>
-        <th>Property</th>
-        <th ng-bind="selectedCluster || 'Cluster'"></th>
-        <th ng-bind="compareCluster || 'Compared Cluster'"></th>
-      </tr>
-      <tr ng-repeat="x in differences">
-        <td ng-bind="x.path[0]"></td>
-        <td ng-class="{'bg-red': x.kind === 'D', 'bg-yellow': x.kind === 'E'}" ng-bind="x.lhs"></td>
-        <td ng-class="{'bg-green': x.kind === 'N', 'bg-yellow': x.kind === 'E'}" ng-bind="x.rhs"></td>
-      </tr>
-    </table>
-  </div>
-  
+  <span ng-if="selectedCompare === 'ambari'">
+    <div>
+      <table>
+        <tr>
+          <th>Cluster 1</th>
+          <th>Config</th>
+          <th>Cluster 2</th>
+          <th></th>
+        </tr>
+        <tr>
+          <td>
+            <select ng-model="selectedCluster" ng-change="configList(selectedCluster, 'cluster1')">
+              <option ng-repeat="cluster in clusters" ng-selected="selectedCluster == cluster" value="{{cluster}}" ng-bind="cluster"></option>
+            </select>
+          </td>
+          <td>
+            <select ng-model="selectedConfig" ng-options="key as key for (key, value) in config.cluster1"></select>
+          </td>
+          <td>
+            <select ng-model="compareCluster" ng-change="configList(compareCluster, 'cluster2')">
+              <option ng-if="cluster !== selectedCluster" ng-repeat="cluster in clusters" ng-selected="compareCluster == cluster" value="{{cluster}}" ng-bind="cluster"></option>
+            </select>
+          </td>
+          <td>
+            <button ng-disabled="!config.cluster2" ng-click="getConfig(selectedCluster, compareCluster, selectedConfig)">Go</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div>
+      <table>
+        <tr>
+          <th>Property</th>
+          <th ng-bind="selectedCluster || 'Cluster 1'"></th>
+          <th ng-bind="compareCluster || 'Cluster 2'"></th>
+        </tr>
+        <tr ng-repeat="x in differences">
+          <td ng-bind="x.path[0]"></td>
+          <td ng-class="{'bg-red': x.kind === 'D', 'bg-yellow': x.kind === 'E'}" ng-bind="x.lhs"></td>
+          <td ng-class="{'bg-green': x.kind === 'N', 'bg-yellow': x.kind === 'E'}" ng-bind="x.rhs"></td>
+        </tr>
+      </table>
+    </div>
+  </span>
+
+  <span ng-if="selectedCompare === 'xml'">
+    <div>
+      <table>
+        <tr>
+          <th>XML 1</th>
+          <th>XML 2</th>
+          <th></th>
+        </tr>
+        <tr>
+          <td>
+            <textarea ng-model="$parent.xml1"></textarea>
+          </td>
+          <td>
+            <textarea ng-model="$parent.xml2"></textarea>
+          </td>
+          <td>
+            <button ng-click="postXml()">Go</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div>
+      <table>
+        <tr>
+          <th>Property</th>
+          <th>XML 1</th>
+          <th>XML 2</th>
+        </tr>
+        <tr ng-repeat="x in xmlDiff">
+          <td ng-bind="x.path[0]"></td>
+          <td ng-class="{'bg-red': x.kind === 'D', 'bg-yellow': x.kind === 'E'}" ng-bind="x.lhs"></td>
+          <td ng-class="{'bg-green': x.kind === 'N', 'bg-yellow': x.kind === 'E'}" ng-bind="x.rhs"></td>
+        </tr>
+      </table>
+    </div>
+  </span>
+
   </body>
   <script src="https://rawgit.com/flitbit/diff/master/releases/deep-diff-0.3.4.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>

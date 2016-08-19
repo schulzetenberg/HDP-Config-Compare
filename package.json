@@ -16,11 +16,13 @@
     "url": "https://github.com/schulzetenberg/hdp-config-compare/issues"
   },
   "dependencies": {
+    "body-parser": "^1.15.2",
     "config": "^1.21.0",
     "ejs": "^2.5.1",
     "express": "^4.14.0",
     "node-rest-client": "^2.0.1",
-    "q": "^1.4.1"
+    "q": "^1.4.1",
+    "xml2js": "^0.4.17"
   },
   "devDependencies": {
     "chai": "^3.4.1",

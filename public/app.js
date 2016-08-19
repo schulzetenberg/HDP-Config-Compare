@@ -10,6 +10,8 @@
 var app = angular.module('mainApp', []);
 
 app.controller('mainCtrl', function($scope, $http, $q) {
+  $scope.selectedCompare = 'ambari';
+  $scope.config = {};
 
   $http.get("cluster-list").then(function(response){
     $scope.clusters = response.data;
@@ -17,22 +19,25 @@ app.controller('mainCtrl', function($scope, $http, $q) {
      console.log(err);
    });
 
-  $scope.configList = function(cluster, scopeVar){
+  $scope.configList = function(cluster, prop){
     if($scope.differences) $scope.differences = [];
     $http.get("config-list?cluster=" + cluster).then(function(response){
-      $scope[scopeVar] = response.data;
+      $scope.config[prop] = response.data;
      }, function(err){
        console.log(err);
      });
   };
 
-  $scope.getConfig = function(){
-    var selected = $scope.configs[$scope.selectedConfig];
-    var selectedCompare = $scope.configsCompare[$scope.selectedConfig];
+  $scope.getConfig = function(clusterName1, clusterName2, selectedConfig) {
+    var tag1 = $scope.config.cluster1[selectedConfig].tag;
+    var tag2 = '';
+    if($scope.config.cluster2[selectedConfig]){
+      tag2 = $scope.config.cluster2[selectedConfig].tag;
+    }
 
     var promises = [];
-    promises.push($http.get("properties?cluster=" + $scope.selectedCluster + '&type=' + $scope.selectedConfig + '&tag=' + selected.tag));
-    if(selectedCompare && selectedCompare.tag) promises.push($http.get("properties?cluster=" + $scope.compareCluster + '&type=' + $scope.selectedConfig + '&tag=' + selectedCompare.tag));
+    promises.push($http.get("properties?cluster=" + clusterName1 + '&type=' + selectedConfig + '&tag=' + tag1));
+    if(tag2) promises.push($http.get("properties?cluster=" + clusterName2 + '&type=' + selectedConfig + '&tag=' + tag2));
 
     $q.all(promises).then(function(data){
       $scope.cluster1 = data[0].data;
@@ -47,6 +52,20 @@ app.controller('mainCtrl', function($scope, $http, $q) {
     }).catch(function(err){
       console.log(err);
     });
+  };
+
+  $scope.postXml = function(){
+  var postData = {
+    xml1: $scope.xml1,
+    xml2: $scope.xml2
+  };
+  $http.post('/xml-to-js', postData).then(function(response){
+    if(response.data[0].error || response.data[1].error) return alert("Error parsing XML");
+    $scope.xmlDiff = DeepDiff(response.data[0], response.data[1]);
+    if(!$scope.xmlDiff) $scope.xmlDiff = [{path: ['No differences']}];
+   }, function(err){
+     console.log(err);
+   });
   };
 
 });
