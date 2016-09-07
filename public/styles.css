@@ -1,5 +1,8 @@
-table, select, button {
+table, select, button, textarea {
   width: 100%;
+}
+textarea {
+  height: 500px;
 }
 div {
   margin: 20px;
